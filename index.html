@@ -9,6 +9,7 @@
 <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Pasaporte">
+<meta name="author" content="Juanjo Juliá">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CL">
 <meta property="og:title" content="Pasaporte del Desierto Florido">
@@ -120,6 +121,8 @@ p{margin:0}
 .p-texto h1{font-weight:400;margin:0}
 .p-texto h1 .h1-a{display:block;font-family:var(--f-body);font-stretch:125%;font-weight:700;font-size:clamp(13px,1.5vw,15px);letter-spacing:.34em;text-transform:uppercase;color:var(--atacamita);margin-bottom:14px}
 .p-texto h1 .h1-b{display:block;font-family:var(--f-display);font-style:italic;font-weight:400;font-size:clamp(52px,9vw,112px);line-height:.9;letter-spacing:-.02em}
+.p-texto .autoria{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris);margin:18px 0 0}
+.p-texto .autoria b{color:var(--tinta);font-weight:600}
 .p-texto .bajada{font-size:clamp(17px,1.7vw,19px);line-height:1.5;color:var(--gris);max-width:44ch;margin-top:22px}
 .ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 15px/1 var(--f-body);padding:13px 20px;border-radius:999px;border:1.5px solid var(--tinta);background:transparent;color:var(--tinta);text-decoration:none;cursor:pointer;transition:background .2s,color .2s,transform .12s}
@@ -478,6 +481,7 @@ footer .envoltura{display:flex;flex-wrap:wrap;justify-content:space-between;gap:
   <header class="portada" id="inicio">
     <div class="p-texto">
       <h1><span class="h1-a">Pasaporte del</span><span class="h1-b">Desierto Florido</span></h1>
+      <p class="autoria">Creado por <b>Juanjo Juliá</b></p>
       <p class="bajada">41 flores para buscar entre Caldera, Copiapó, Vallenar y la costa de Huasco, cada una con foto, nombre común y nombre científico. Cuando encuentres una, séllala.</p>
       <div class="ctas">
         <a class="btn primario" href="#album">Abrir el álbum</a>
@@ -772,7 +776,7 @@ footer .envoltura{display:flex;flex-wrap:wrap;justify-content:space-between;gap:
 
 <footer>
   <div class="envoltura">
-    <span>Pasaporte del Desierto Florido · Atacama 2026</span>
+    <span>Pasaporte del Desierto Florido · Atacama 2026 · Creado por Juanjo Juliá</span>
     <span>Información reunida el 29 de septiembre de 2026. Mira, fotografía y deja las flores donde están.</span>
   </div>
 </footer>
@@ -1196,7 +1200,7 @@ setTimeout(precargar, 1800);
 <script>
 (function(){
   if(!("serviceWorker" in navigator) || location.protocol === "file:") return;
-  var CACHE = "pasaporte-df-18c8e04908", TOTAL = 50;
+  var CACHE = "pasaporte-df-e8e16a47d0", TOTAL = 50;
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("sw.js").then(function(){ return navigator.serviceWorker.ready; })
       .then(function(){ return caches.open(CACHE); })

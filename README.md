@@ -1,5 +1,7 @@
 # Pasaporte del Desierto Florido
 
+Creado por Juanjo Juliá.
+
 Guía de campo para buscar y sellar 41 flores del desierto florido de Atacama, temporada 2026. Cada flor tiene foto, nombre común, nombre científico, cómo reconocerla, dónde y cuándo buscarla, y su estado de conservación. Incluye un mapa de lugares, el estado de la temporada 2026, las reglas de CONAF y consejos de terreno.
 
 **Abrir el pasaporte:** https://juanjosejulia-code.github.io/pasaporte-desierto-florido/
