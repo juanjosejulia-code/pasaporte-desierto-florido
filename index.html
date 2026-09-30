@@ -264,10 +264,11 @@ p{margin:0}
 dialog.ficha{border:0;padding:0;background:var(--papel);color:var(--tinta);width:min(980px,calc(100% - 32px));max-width:none;max-height:min(92vh,900px);border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden}
 dialog.ficha::backdrop{background:var(--velo);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .f-in{display:flex;flex-direction:column;max-height:min(92vh,900px)}
-.f-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px 12px 22px;border-bottom:1px solid var(--linea);background:var(--hoja)}
+.f-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-bottom:1px solid var(--linea);background:var(--hoja)}
 .f-top .pag{font-size:11px}
-.f-cerrar{width:40px;height:40px;border-radius:50%;border:1px solid var(--linea);background:var(--papel);cursor:pointer;display:grid;place-items:center}
-.f-cerrar svg{width:16px;height:16px}
+.f-volver{display:inline-flex;align-items:center;gap:8px;font:600 15px/1 var(--f-body);color:var(--tinta);background:var(--papel);border:1.5px solid var(--linea);border-radius:999px;padding:10px 16px 10px 12px;cursor:pointer}
+.f-volver:hover{border-color:var(--tinta)}
+.f-volver svg{width:16px;height:16px;flex:none}
 .f-scroll{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:26px 22px 30px}
 .f-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(22px,4vw,44px);align-items:start}
 .f-foto{margin:0;position:sticky;top:0}
@@ -314,7 +315,7 @@ dialog.ficha::backdrop{background:var(--velo);-webkit-backdrop-filter:blur(3px);
 .f-fuentes a{color:inherit;word-break:break-word}
 .f-nav{display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-top:1px solid var(--linea);background:var(--hoja)}
 @media (max-width:760px){
-  dialog.ficha{width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0;margin:0}
+  dialog.ficha{width:100%;max-width:100%;height:100%;max-height:100%;height:100dvh;max-height:100dvh;border-radius:0;margin:0}
   .f-in{height:100%;max-height:100%;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
   .f-grid{grid-template-columns:1fr}
   .f-foto{position:relative}
@@ -784,8 +785,8 @@ footer .envoltura{display:flex;flex-wrap:wrap;justify-content:space-between;gap:
 <dialog class="ficha" id="ficha" aria-labelledby="f-nombre">
   <div class="f-in">
     <div class="f-top">
+      <button type="button" class="f-volver" id="f-cerrar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>Volver al álbum</button>
       <span class="pag" id="f-pag">N.º 01 / 41</span>
-      <button type="button" class="f-cerrar" id="f-cerrar" aria-label="Cerrar ficha"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13"/></svg></button>
     </div>
     <div class="f-scroll" id="f-scroll"></div>
     <div class="f-nav">
@@ -1043,14 +1044,30 @@ function abrir(i, desdeHash){
   actual = (i + N) % N;
   var f = FLORES[actual];
   $("#f-pag").textContent = nro(f) + " / " + dos(N);
+  var estabaAbierta = dlg.open;
   if(!dlg.open){ if(typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", ""); }
   var sc = $("#f-scroll");
   sc.innerHTML = fichaHTML(f);
   sc.scrollTop = 0;
   requestAnimationFrame(function(){ sc.scrollTop = 0; });
-  if(!desdeHash){ try{ history.replaceState(null, "", "#" + f.id); }catch(e){} }
+  if(!desdeHash){
+    try{
+      if(!estabaAbierta){ history.pushState({ficha: f.id}, "", "#" + f.id); enHistoria = true; }
+      else history.replaceState(enHistoria ? {ficha: f.id} : null, "", "#" + f.id);
+    }catch(e){}
+  }
 }
-function cerrar(){ if(typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); }
+var enHistoria = false;
+function cerrarDialogo(){ if(typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); }
+function cerrar(){
+  if(enHistoria){
+    enHistoria = false;
+    try{ history.back(); }catch(e){}
+    setTimeout(function(){ if(dlg.open) cerrarDialogo(); }, 400);
+    return;
+  }
+  cerrarDialogo();
+}
 function mover(paso){
   var vis = listaVisible(); if(!vis.length) vis = FLORES;
   var pos = vis.indexOf(FLORES[actual]);
@@ -1163,7 +1180,13 @@ function eventos(){
   $("#f-prev").addEventListener("click", function(){ mover(-1); });
   $("#f-next").addEventListener("click", function(){ mover(1); });
   dlg.addEventListener("click", function(e){ if(e.target === dlg) cerrar(); });
-  dlg.addEventListener("close", function(){ try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){} var li = $('.carta[data-id="' + FLORES[actual].id + '"] .carta-btn'); if(li) li.focus({preventScroll:true}); });
+  dlg.addEventListener("cancel", function(e){ e.preventDefault(); cerrar(); });
+  dlg.addEventListener("close", function(){ if(location.hash){ try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){} } var li = $('.carta[data-id="' + FLORES[actual].id + '"] .carta-btn'); if(li) li.focus({preventScroll:true}); });
+  window.addEventListener("popstate", function(e){
+    var st = e.state;
+    if(st && st.ficha && porId[st.ficha]){ enHistoria = true; abrir(porId[st.ficha].i, true); }
+    else if(dlg.open){ enHistoria = false; cerrarDialogo(); }
+  });
   dlg.addEventListener("keydown", function(e){ if(e.target && e.target.tagName === "INPUT") return; if(e.key === "ArrowRight") mover(1); if(e.key === "ArrowLeft") mover(-1); });
   $("#f-scroll").addEventListener("click", function(e){
     if(e.target.closest("#btn-sellar")) sellar();
@@ -1200,7 +1223,7 @@ setTimeout(precargar, 1800);
 <script>
 (function(){
   if(!("serviceWorker" in navigator) || location.protocol === "file:") return;
-  var CACHE = "pasaporte-df-e8e16a47d0", TOTAL = 50;
+  var CACHE = "pasaporte-df-505b5692a5", TOTAL = 50;
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("sw.js").then(function(){ return navigator.serviceWorker.ready; })
       .then(function(){ return caches.open(CACHE); })
